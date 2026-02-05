@@ -125,7 +125,11 @@ button {
 
 <script>
 /* PUZZLE LOGIC */
-const word = ["H","E","L","L","O"];
+const word = [
+  "H","E","L","L","O",
+  " ",
+  "W","O","N","D","E","R","B","O","Y"
+];
 let scrambled = [...word].sort(()=>Math.random()-0.5);
 let selected = null;
 const tilesDiv = document.getElementById("tiles");
