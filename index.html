@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hello Wonder Boy 💖</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: 'Georgia', serif;
+  overflow: hidden;
+  text-align: center;
+}
+
+#puzzle {
+  margin-top: 80px;
+}
+
+.letters {
+  display: inline-flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.letter {
+  padding: 15px 20px;
+  background: #ff4d6d;
+  border-radius: 8px;
+  cursor: grab;
+  font-size: 24px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+}
+
+#scene {
+  display: none;
+  position: relative;
+  height: 100vh;
+}
+
+img {
+  max-width: 300px;
+  margin: 20px;
+}
+
+.petal {
+  position: fixed;
+  top: -50px;
+  width: 30px;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="puzzle">
+  <h1>Arrange the letters 💌</h1>
+  <div class="letters" id="letters">
+    <div class="letter" draggable="true">O</div>
+    <div class="letter" draggable="true">L</div>
+    <div class="letter" draggable="true">H</div>
+    <div class="letter" draggable="true">E</div>
+  </div>
+  <button onclick="check()">Done</button>
+</div>
+
+<div id="scene">
+  <h1>Hello Wonder Boy 💖</h1>
+  <img src="us.jpg" alt="Us">
+  <img src="wedding.png" alt="Wedding">
+</div>
+
+<script>
+let dragged;
+
+document.querySelectorAll('.letter').forEach(l => {
+  l.addEventListener('dragstart', e => dragged = l);
+  l.addEventListener('dragover', e => e.preventDefault());
+  l.addEventListener('drop', e => {
+    e.preventDefault();
+    if (dragged && dragged !== l) {
+      const parent = l.parentNode;
+      parent.insertBefore(dragged, l);
+    }
+  });
+});
+
+function check() {
+  const word = [...document.querySelectorAll('.letter')]
+    .map(l => l.innerText)
+    .join('');
+  if (word === 'HELO') {
+    document.getElementById('puzzle').style.display = 'none';
+    document.getElementById('scene').style.display = 'block';
+    petals();
+  } else {
+    alert('Try again 💔');
+  }
+}
+
+function petals() {
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('img');
+    p.src = 'rose.png';
+    p.className = 'petal';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = 5 + Math.random() * 5 + 's';
+    document.body.appendChild(p);
+  }
+}
+</script>
+
+</body>
+</html>
