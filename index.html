@@ -3,85 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <title>Hello Wonderboy ❤️</title>
+
 <style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
+*{box-sizing:border-box}
+body{
+  margin:0;
   font-family: 'Georgia', serif;
-  background: black;
-  color: white;
-  overflow: hidden;
+  background:black;
+  color:white;
+  overflow:hidden;
 }
 
-/* SCREENS */
-.screen {
-  position: absolute;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+.screen{
+  position:absolute;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
 }
-.screen.active { display: flex; }
+.screen.active{display:flex}
 
-/* PUZZLE */
-#puzzle {
-  background: url("puzzle.jpg") center/cover no-repeat;
+/* ---------- PUZZLE ---------- */
+#puzzle{
+  background:#000;
 }
-.tiles {
-  display: flex;
-  gap: 12px;
+.tiles{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  max-width:420px;
+  gap:10px;
 }
-.tile {
-  width: 70px;
-  height: 70px;
-  background: #ff5c8a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  border-radius: 12px;
-  cursor: pointer;
+.tile{
+  width:48px;
+  height:48px;
+  background:#ff5c8a;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
 }
-.tile.selected { outline: 3px solid white; }
-button {
-  margin-top: 25px;
-  padding: 10px 22px;
-  font-size: 16px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
+.tile.selected{
+  outline:3px solid white;
 }
-
-/* 404 */
-#err { font-size: 36px; }
-
-/* QUESTION */
-#question {
-  background: url("us.jpg") center/cover no-repeat;
-}
-.overlay {
-  background: rgba(0,0,0,0.6);
-  padding: 40px;
-  border-radius: 20px;
-  text-align: center;
+button{
+  margin-top:25px;
+  padding:10px 22px;
+  font-size:16px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
 }
 
-/* FINAL */
-#final {
-  background: url("wedding.png") center/contain no-repeat;
+/* ---------- 404 ---------- */
+#err{font-size:34px}
+
+/* ---------- QUESTION ---------- */
+#question{
+  background:url("us.jpg") center/cover no-repeat;
+}
+.overlay{
+  background:rgba(0,0,0,0.6);
+  padding:35px;
+  border-radius:20px;
 }
 
-/* PETALS */
-.petal {
-  position: fixed;
-  top: -50px;
-  width: 30px;
-  pointer-events: none;
-  animation: fall linear infinite;
+/* ---------- FINAL ---------- */
+#final{
+  background:black;
 }
-@keyframes fall {
-  to { transform: translateY(110vh) rotate(360deg); }
+#wedding{
+  width:260px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-15px)}
+}
+
+/* ---------- PETALS / CONFETTI ---------- */
+.petal{
+  position:fixed;
+  top:-60px;
+  width:32px;
+  pointer-events:none;
+  animation:fall linear infinite;
+}
+@keyframes fall{
+  to{transform:translateY(110vh) rotate(360deg)}
+}
+
+.confetti{
+  position:fixed;
+  width:8px;
+  height:8px;
+  background:red;
+  animation:fall linear infinite;
 }
 </style>
 </head>
@@ -98,13 +119,14 @@ button {
 <!-- 404 -->
 <div id="page404" class="screen">
   <div id="err">404: Single Status Not Found</div>
-  <button onclick="goQuestion()">Refresh</button>
+  <button onclick="show('question')">Refresh</button>
 </div>
 
 <!-- QUESTION -->
 <div id="question" class="screen">
   <div class="overlay">
     <h1>Will you be my Valentine, Wonderboy?</h1>
+    <br>
     <button onclick="yes()">Yes</button>
     <button onclick="no()">No</button>
   </div>
@@ -112,86 +134,91 @@ button {
 
 <!-- FINAL -->
 <div id="final" class="screen">
+  <img id="wedding" src="wedding.png">
   <div class="overlay">
-    <h1>
-      Yes, that's like my man ❤️<br>
-      Now you're hinged for life.<br><br>
-      I love you pretty boy.<br>
-      I'll marry you someday for sure.<br>
+    <h2>
+      Yes, that's like my man ❤️<br><br>
+      Now you're hinged for life.<br>
+      I love you pretty boy,<br>
+      and I'll marry you someday for sure.<br><br>
       Na korte chaile tuley niye jabo 😋
-    </h1>
+    </h2>
   </div>
 </div>
 
 <script>
-/* PUZZLE LOGIC */
-const word = [
-  "H","E","L","L","O",
-  " ",
-  "W","O","N","D","E","R","B","O","Y"
-];
-let scrambled = [...word].sort(()=>Math.random()-0.5);
-let selected = null;
-const tilesDiv = document.getElementById("tiles");
-
-scrambled.forEach((l,i)=>{
-  const d=document.createElement("div");
-  d.className="tile";
-  d.textContent=l;
-  d.onclick=()=>{
-    if(selected===null){
-      selected=i; d.classList.add("selected");
-    } else {
-      [scrambled[selected],scrambled[i]]=[scrambled[i],scrambled[selected]];
-      render();
-      selected=null;
-    }
-  };
-  tilesDiv.appendChild(d);
-});
-
-function render(){
-  tilesDiv.innerHTML="";
-  scrambled.forEach((l,i)=>{
-    const d=document.createElement("div");
-    d.className="tile";
-    d.textContent=l;
-    d.onclick=()=>{ selected=i; };
-    tilesDiv.appendChild(d);
-  });
+/* ---------- SCREEN CONTROL ---------- */
+function show(id){
+  document.querySelectorAll(".screen")
+    .forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
+/* ---------- PUZZLE ---------- */
+const target="HELLO WONDERBOY";
+let letters=[...target].sort(()=>Math.random()-0.5);
+let selected=null;
+const tiles=document.getElementById("tiles");
+
+function render(){
+  tiles.innerHTML="";
+  letters.forEach((l,i)=>{
+    const d=document.createElement("div");
+    d.className="tile";
+    d.textContent=l===" "?"•":l;
+    d.onclick=()=>{
+      if(selected===null){
+        selected=i; d.classList.add("selected");
+      }else{
+        [letters[selected],letters[i]]=[letters[i],letters[selected]];
+        selected=null;
+        render();
+      }
+    };
+    tiles.appendChild(d);
+  });
+}
+render();
+
 function checkPuzzle(){
-  if(scrambled.join("")==="HELLOWONDERBOY"){
+  if(letters.join("")===target){
     show("page404");
-  } else {
+  }else{
     alert("Try again 😋");
   }
 }
 
-/* SCREEN CONTROL */
-function show(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+/* ---------- NO / YES ---------- */
+function no(){
+  alert("Ek thappor marbo 😌");
 }
 
-/* FLOW */
-function goQuestion(){ show("question"); }
-function no(){ alert("Ek thappor marbo 😌"); }
 function yes(){
   show("final");
-  petals();
+  petals(40);
+  confetti(60);
 }
 
-/* PETALS */
-function petals(){
-  for(let i=0;i<40;i++){
+/* ---------- EFFECTS ---------- */
+function petals(n){
+  for(let i=0;i<n;i++){
     const p=document.createElement("img");
     p.src="rose.png";
     p.className="petal";
     p.style.left=Math.random()*100+"vw";
     p.style.animationDuration=5+Math.random()*5+"s";
     document.body.appendChild(p);
+  }
+}
+
+function confetti(n){
+  for(let i=0;i<n;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},100%,60%)`;
+    c.style.animationDuration=3+Math.random()*4+"s";
+    document.body.appendChild(c);
   }
 }
 </script>
