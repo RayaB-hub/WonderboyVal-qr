@@ -2,62 +2,84 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HelloWonderBoy💖</title>
-
+<title>Hello Wonderboy ❤️</title>
 <style>
+* { box-sizing: border-box; }
 body {
   margin: 0;
+  font-family: 'Georgia', serif;
   background: black;
   color: white;
-  font-family: 'Georgia', serif;
   overflow: hidden;
+}
+
+/* SCREENS */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.screen.active { display: flex; }
+
+/* PUZZLE */
+#puzzle {
+  background: url("puzzle.jpg") center/cover no-repeat;
+}
+.tiles {
+  display: flex;
+  gap: 12px;
+}
+.tile {
+  width: 70px;
+  height: 70px;
+  background: #ff5c8a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.tile.selected { outline: 3px solid white; }
+button {
+  margin-top: 25px;
+  padding: 10px 22px;
+  font-size: 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+/* 404 */
+#err { font-size: 36px; }
+
+/* QUESTION */
+#question {
+  background: url("us.jpg") center/cover no-repeat;
+}
+.overlay {
+  background: rgba(0,0,0,0.6);
+  padding: 40px;
+  border-radius: 20px;
   text-align: center;
 }
 
-#puzzle {
-  margin-top: 80px;
+/* FINAL */
+#final {
+  background: url("wedding.png") center/contain no-repeat;
 }
 
-.letters {
-  display: inline-flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.letter {
-  padding: 15px 20px;
-  background: #ff4d6d;
-  border-radius: 8px;
-  cursor: grab;
-  font-size: 24px;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 6px;
-  border: none;
-}
-
-#scene {
-  display: none;
-  position: relative;
-  height: 100vh;
-}
-
-img {
-  max-width: 300px;
-  margin: 20px;
-}
-
+/* PETALS */
 .petal {
   position: fixed;
   top: -50px;
   width: 30px;
+  pointer-events: none;
   animation: fall linear infinite;
 }
-
 @keyframes fall {
   to { transform: translateY(110vh) rotate(360deg); }
 }
@@ -66,58 +88,105 @@ img {
 
 <body>
 
-<div id="puzzle">
-  <h1>Arrange the letters 💌</h1>
-  <div class="letters" id="letters">
-    <div class="letter" draggable="true">O</div>
-    <div class="letter" draggable="true">L</div>
-    <div class="letter" draggable="true">H</div>
-    <div class="letter" draggable="true">E</div>
-  </div>
-  <button onclick="check()">Done</button>
+<!-- PUZZLE -->
+<div id="puzzle" class="screen active">
+  <h1>Arrange the letters 💗</h1>
+  <div class="tiles" id="tiles"></div>
+  <button onclick="checkPuzzle()">Done</button>
 </div>
 
-<div id="scene">
-  <h1>Hello Wonder Boy 💖</h1>
-  <img src="us.jpg" alt="Us">
-  <img src="wedding.png" alt="Wedding">
+<!-- 404 -->
+<div id="page404" class="screen">
+  <div id="err">404: Single Status Not Found</div>
+  <button onclick="goQuestion()">Refresh</button>
+</div>
+
+<!-- QUESTION -->
+<div id="question" class="screen">
+  <div class="overlay">
+    <h1>Will you be my Valentine, Wonderboy?</h1>
+    <button onclick="yes()">Yes</button>
+    <button onclick="no()">No</button>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="final" class="screen">
+  <div class="overlay">
+    <h1>
+      Yes, that's like my man ❤️<br>
+      Now you're hinged for life.<br><br>
+      I love you pretty boy.<br>
+      I'll marry you someday for sure.<br>
+      Na korte chaile tuley niye jabo 😋
+    </h1>
+  </div>
 </div>
 
 <script>
-let dragged;
+/* PUZZLE LOGIC */
+const word = ["H","E","L","L","O"];
+let scrambled = [...word].sort(()=>Math.random()-0.5);
+let selected = null;
+const tilesDiv = document.getElementById("tiles");
 
-document.querySelectorAll('.letter').forEach(l => {
-  l.addEventListener('dragstart', e => dragged = l);
-  l.addEventListener('dragover', e => e.preventDefault());
-  l.addEventListener('drop', e => {
-    e.preventDefault();
-    if (dragged && dragged !== l) {
-      const parent = l.parentNode;
-      parent.insertBefore(dragged, l);
+scrambled.forEach((l,i)=>{
+  const d=document.createElement("div");
+  d.className="tile";
+  d.textContent=l;
+  d.onclick=()=>{
+    if(selected===null){
+      selected=i; d.classList.add("selected");
+    } else {
+      [scrambled[selected],scrambled[i]]=[scrambled[i],scrambled[selected]];
+      render();
+      selected=null;
     }
-  });
+  };
+  tilesDiv.appendChild(d);
 });
 
-function check() {
-  const word = [...document.querySelectorAll('.letter')]
-    .map(l => l.innerText)
-    .join('');
-  if (word === 'HELO') {
-    document.getElementById('puzzle').style.display = 'none';
-    document.getElementById('scene').style.display = 'block';
-    petals();
+function render(){
+  tilesDiv.innerHTML="";
+  scrambled.forEach((l,i)=>{
+    const d=document.createElement("div");
+    d.className="tile";
+    d.textContent=l;
+    d.onclick=()=>{ selected=i; };
+    tilesDiv.appendChild(d);
+  });
+}
+
+function checkPuzzle(){
+  if(scrambled.join("")==="HELLOWONDERBOY"){
+    show("page404");
   } else {
-    alert('Try again 💔');
+    alert("Try again 😋");
   }
 }
 
-function petals() {
-  for (let i = 0; i < 25; i++) {
-    const p = document.createElement('img');
-    p.src = 'rose.png';
-    p.className = 'petal';
-    p.style.left = Math.random() * 100 + 'vw';
-    p.style.animationDuration = 5 + Math.random() * 5 + 's';
+/* SCREEN CONTROL */
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* FLOW */
+function goQuestion(){ show("question"); }
+function no(){ alert("Ek thappor marbo 😌"); }
+function yes(){
+  show("final");
+  petals();
+}
+
+/* PETALS */
+function petals(){
+  for(let i=0;i<40;i++){
+    const p=document.createElement("img");
+    p.src="rose.png";
+    p.className="petal";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=5+Math.random()*5+"s";
     document.body.appendChild(p);
   }
 }
