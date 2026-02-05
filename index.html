@@ -11,7 +11,8 @@ body{
   font-family: 'Georgia', serif;
   background:black;
   color:white;
-  overflow:hidden;
+  overflow-x:hidden;   /* only hide sideways scroll */
+  overflow-y:auto;     /* allow falling animation */
 }
 
 .screen{
@@ -64,7 +65,8 @@ button{
 
 /* ---------- QUESTION ---------- */
 #question{
-  background:url("us.jpg") center/cover no-repeat;
+  background: url("./us.jpg") center center / cover no-repeat;
+  min-height: 100vh;
 }
 .overlay{
   background:rgba(0,0,0,0.6);
@@ -91,6 +93,7 @@ button{
   top:-60px;
   width:32px;
   pointer-events:none;
+  z-index:9999;   /* THIS is crucial */
   animation:fall linear infinite;
 }
 @keyframes fall{
